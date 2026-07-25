@@ -1,253 +1,168 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import Board from './Board'
 import Dice from './Dice'
 import QuestionModal from './QuestionModal'
 import AcidAlertModal from './AcidAlertModal'
 import ScoreBoard from './ScoreBoard'
 import GameHistory from './GameHistory'
+import Confetti from './Confetti'
+import { BOARD_SIZE } from '../data/boardPath'
+import { pickRandomQuestion, RECENT_QUESTIONS_WINDOW } from '../data/questions'
+import { resolveMove, applyAcidPenalty, pickRandomAcid, rollDice, updatePlayer, ACID_PENALTY } from '../utils/gameLogic'
+import { saveGame, clearGame } from '../utils/storage'
+import { playDiceRoll, playWin } from '../utils/sound'
 
-const GameBoard = ({ players: initialPlayers }) => {
+const timestamp = () => new Date().toLocaleTimeString()
+
+const GameBoard = ({ players: initialPlayers, initialState, onExit }) => {
   const [players, setPlayers] = useState(initialPlayers)
-  const [currentPlayer, setCurrentPlayer] = useState(0)
+  const [currentPlayer, setCurrentPlayer] = useState(initialState?.currentPlayer ?? 0)
   const [diceValue, setDiceValue] = useState(null)
   const [isRolling, setIsRolling] = useState(false)
   const [showQuestion, setShowQuestion] = useState(false)
+  const [currentQuestion, setCurrentQuestion] = useState(null)
+  const [recentQuestionIds, setRecentQuestionIds] = useState(initialState?.recentQuestionIds ?? [])
   const [showAcidAlert, setShowAcidAlert] = useState(false)
   const [pendingAcidMove, setPendingAcidMove] = useState(null)
   const [acidType, setAcidType] = useState('cloridrico')
-  const [pendingMove, setPendingMove] = useState(null)
-  const [gameHistory, setGameHistory] = useState([])
+  const [gameHistory, setGameHistory] = useState(initialState?.gameHistory ?? [])
   const [canRoll, setCanRoll] = useState(true)
 
-  const boardSize = 50 // Número de casas no tabuleiro
+  const addHistory = (player, action) => {
+    setGameHistory(prev => [...prev, { player, action, timestamp: timestamp() }])
+  }
+
+  const winner = players.find(player => player.finished)
+  const gameEnded = Boolean(winner)
+
+  useEffect(() => {
+    if (gameEnded) {
+      clearGame()
+      return
+    }
+    saveGame({ players, currentPlayer, gameHistory, recentQuestionIds })
+  }, [players, currentPlayer, gameHistory, recentQuestionIds, gameEnded])
+
+  const nextTurn = () => {
+    setCurrentPlayer(prev => (prev + 1) % players.length)
+    setCanRoll(true)
+  }
 
   const handleDiceRoll = async () => {
     if (!canRoll || isRolling) return
-    
+
     setIsRolling(true)
     setCanRoll(false)
-    
-    // Simular animação do dado
+    playDiceRoll()
+
     await new Promise(resolve => setTimeout(resolve, 800))
-    
-    const value = Math.floor(Math.random() * 6) + 1
+
+    const value = rollDice()
     setDiceValue(value)
-    
-    // Adicionar ao histórico
-    const historyEntry = {
-      player: players[currentPlayer].name,
-      action: `lançou o dado e tirou ${value}`,
-      timestamp: new Date().toLocaleTimeString()
-    }
-    setGameHistory(prev => [...prev, historyEntry])
-    
+    addHistory(players[currentPlayer].name, `lançou o dado e tirou ${value}`)
     setIsRolling(false)
-    
-    // Esperar 2 segundos para mostrar o resultado do dado antes da pergunta
+
     setTimeout(() => {
+      const question = pickRandomQuestion(recentQuestionIds)
+      setCurrentQuestion(question)
+      setRecentQuestionIds(prev => [...prev, question.id].slice(-RECENT_QUESTIONS_WINDOW))
       setShowQuestion(true)
-    }, 2000)
+    }, 1500)
+  }
+
+  const finishQuestionRound = () => {
+    setShowQuestion(false)
+    setCurrentQuestion(null)
+    setDiceValue(null)
   }
 
   const handleQuestionAnswer = (correct) => {
-    if (correct && pendingMove !== null) {
-      // Move o jogador
-      const oldPosition = players[currentPlayer].position
-      let newPosition = oldPosition + diceValue
-      
-      console.log(`=== MOVIMENTO ===`)
-      console.log(`Jogador: ${players[currentPlayer].name}`)
-      console.log(`Posição antiga: ${oldPosition}`)
-      console.log(`Valor do dado: ${diceValue}`)
-      console.log(`Nova posição calculada: ${oldPosition} + ${diceValue} = ${newPosition}`)
-      
-      let points = diceValue * 10
-      let actionText = `respondeu corretamente e moveu ${diceValue} casas (da ${oldPosition} para a ${newPosition})`
-      
-      // Verifica se a nova posição é uma casa especial
-      const boardLayout = [
-          { id: 4, type: 'danger' },
-          { id: 9, type: 'safe' },
-          { id: 12, type: 'danger' },
-          { id: 18, type: 'safe' },
-          { id: 20, type: 'danger' },
-          { id: 30, type: 'danger' },
-          { id: 34, type: 'safe' },
-          { id: 38, type: 'danger' },
-          { id: 42, type: 'safe' },
-          { id: 45, type: 'danger' },
-          { id: 50, type: 'danger' }
-        ]
-        
-        const landedCell = boardLayout.find(cell => cell.id === newPosition)
-        
-        if (landedCell) {
-          if (landedCell.type === 'safe') {
-            points += 20
-            actionText += ` + ganhou 20 pontos extras na casa segura!`
-          } else if (landedCell.type === 'danger') {
-            // Mostra alerta de ácido antes de voltar
-            const acids = ['cloridrico', 'sulfurico', 'nitrico', 'acetico']
-            const randomAcid = acids[Math.floor(Math.random() * acids.length)]
-            setAcidType(randomAcid)
-            setPendingAcidMove(oldPosition)
-            setShowAcidAlert(true)
-            
-            // Não atualiza a posição ainda - espera o alerta
-            return prevPlayers
-          }
-        }
-        
-        newPosition = Math.min(newPosition, boardSize)
-        
-        // Atualiza o estado do jogador
-        setPlayers(prevPlayers => {
-          const newPlayers = [...prevPlayers]
-          newPlayers[currentPlayer].position = newPosition
-          newPlayers[currentPlayer].score += points
-          
-          console.log(`Posição final após atualização: ${newPlayers[currentPlayer].position}`)
-          
-          return newPlayers
-        })
-        
-        // Adiciona ao histórico
-        const historyEntry = {
-          player: players[currentPlayer].name,
-          action: actionText,
-          timestamp: new Date().toLocaleTimeString()
-        }
-        setGameHistory(prev => [...prev, historyEntry])
-        
-        // Verifica se o jogador venceu
-        if (newPosition >= boardSize) {
-          setPlayers(prevPlayers => {
-            const newPlayers = [...prevPlayers]
-            newPlayers[currentPlayer].finished = true
-            return newPlayers
-          })
-          
-          const winEntry = {
-            player: players[currentPlayer].name,
-            action: `venceu o jogo! 🎉`,
-            timestamp: new Date().toLocaleTimeString()
-          }
-          setGameHistory(prev => [...prev, winEntry])
-        } else {
-          // Passa para o próximo jogador após 1 segundo
-          setTimeout(() => {
-            nextTurn()
-          }, 1000)
-        }
-    } else {
-      // Errou a pergunta - perde a vez
-      const historyEntry = {
-        player: players[currentPlayer].name,
-        action: `errou a pergunta e perdeu a vez`,
-        timestamp: new Date().toLocaleTimeString()
-      }
-      setGameHistory(prev => [...prev, historyEntry])
-      
-      // Passa para o próximo jogador imediatamente
+    const player = players[currentPlayer]
+
+    if (!correct || diceValue === null) {
+      addHistory(player.name, 'errou a pergunta e perdeu a vez')
+      finishQuestionRound()
       nextTurn()
+      return
     }
-    
-    setShowQuestion(false)
-    setPendingMove(null)
-    setDiceValue(null)
+
+    const oldPosition = player.position
+    const result = resolveMove(oldPosition, diceValue)
+
+    if (result.kind === 'danger') {
+      setAcidType(pickRandomAcid())
+      setPendingAcidMove(result.fromPosition)
+      setShowAcidAlert(true)
+      finishQuestionRound()
+      return
+    }
+
+    setPlayers(prev => updatePlayer(prev, currentPlayer, {
+      position: result.position,
+      scoreDelta: result.points,
+      finished: result.won
+    }))
+
+    const bonusText = result.bonus ? ' + ganhou 20 pontos extras na casa segura!' : ''
+    addHistory(player.name, `respondeu corretamente e moveu ${diceValue} casas (da ${oldPosition} para a ${result.position})${bonusText}`)
+
+    if (result.won) {
+      addHistory(player.name, 'venceu o jogo! 🎉')
+      playWin()
+    } else {
+      setTimeout(nextTurn, 1000)
+    }
+
+    finishQuestionRound()
   }
 
   const handleAcidAlert = () => {
-    console.log('=== TRATANDO ALERTA DE ÁCIDO ===')
-    console.log(`Jogador atual: ${players[currentPlayer].name}`)
-    console.log(`Posição antes do ácido: ${pendingAcidMove}`)
-    
-    // Aplica o movimento de volta
-    setPlayers(prevPlayers => {
-      const newPlayers = [...prevPlayers]
-      const currentPlayerData = newPlayers[currentPlayer]
-      
-      const newPosition = Math.max(0, pendingAcidMove - 5)
-      currentPlayerData.position = newPosition
-      
-      console.log(`Nova posição após voltar 5 casas: ${newPosition}`)
-      
-      const historyEntry = {
-        player: currentPlayerData.name,
-        action: `caiu numa casa ácida (${acidType}) e voltou 5 casas para a ${newPosition}`,
-        timestamp: new Date().toLocaleTimeString()
-      }
-      setGameHistory(prev => [...prev, historyEntry])
-      
-      return newPlayers
-    })
-    
+    const player = players[currentPlayer]
+    const newPosition = applyAcidPenalty(pendingAcidMove, ACID_PENALTY)
+
+    setPlayers(prev => updatePlayer(prev, currentPlayer, { position: newPosition }))
+    addHistory(player.name, `caiu numa casa ácida (${acidType}) e voltou ${ACID_PENALTY} casas para a ${newPosition}`)
+
     setShowAcidAlert(false)
-    setShowQuestion(false) // Garante que não vai mostrar pergunta
     setPendingAcidMove(null)
-    setDiceValue(null)
-    setCanRoll(false) // Garante que o próximo jogador possa rolar
-    
-    console.log('=== PRÓXIMO JOGADOR APÓS ÁCIDO ===')
-    
-    // Passa para o próximo jogador após 1 segundo
-    setTimeout(() => {
-      nextTurn()
-    }, 1000)
+    setCanRoll(false)
+
+    setTimeout(nextTurn, 1000)
   }
 
-  const nextTurn = () => {
-    console.log(`=== TROCA DE TURNO ===`)
-    console.log(`Jogador atual: ${players[currentPlayer].name} (índice: ${currentPlayer})`)
-    
-    setCurrentPlayer(prevCurrentPlayer => {
-      // Simplesmente alterna entre 0 e 1 (2 jogadores)
-      const nextPlayer = (prevCurrentPlayer + 1) % players.length
-      console.log(`Próximo jogador: ${players[nextPlayer].name} (índice: ${nextPlayer})`)
-      return nextPlayer
-    })
-    
-    // Garante que o próximo jogador possa rolar o dado
-    setCanRoll(true)
-    console.log(`Próximo jogador pode rolar o dado`)
-    console.log(`=== FIM DA TROCA DE TURNO ===`)
-  }
-
-  const checkGameEnd = () => {
-    return players && players.some(player => player.finished)
-  }
-
-  const resetGame = () => {
-    window.location.reload()
-  }
-
-  useEffect(() => {
-    if (showQuestion && diceValue !== null) {
-      setPendingMove(diceValue)
+  const handleExit = () => {
+    if (window.confirm('Sair da partida atual? O progresso salvo será perdido.')) {
+      clearGame()
+      onExit()
     }
-  }, [showQuestion, diceValue])
+  }
 
-  if (checkGameEnd()) {
-    const winner = players.find(player => player.finished)
+  const handleNewGame = () => {
+    clearGame()
+    onExit()
+  }
+
+  if (gameEnded) {
     return (
-      <div className="text-center">
+      <div className="text-center relative">
+        <Confetti />
         <div className="glass-morphism rounded-2xl p-8 max-w-md mx-auto">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
             🎉 Jogo Terminado! 🎉
           </h2>
-          <p className="text-2xl mb-6">
+          <p className="text-2xl mb-6 text-gray-800 dark:text-gray-100">
             <span style={{ color: winner.color }}>{winner.name}</span> venceu!
           </p>
           <div className="space-y-2 mb-6">
-            {players.map(player => (
-              <div key={player.id} className="flex justify-between items-center p-2 bg-white/50 rounded-lg">
-                <span style={{ color: player.color }}>{player.name}</span>
-                <span className="font-semibold">{player.score} pontos</span>
+            {[...players].sort((a, b) => b.score - a.score).map(player => (
+              <div key={player.id} className="flex justify-between items-center p-2 bg-white/50 dark:bg-slate-800/50 rounded-lg">
+                <span style={{ color: player.color }} className="font-semibold">{player.name}</span>
+                <span className="font-semibold text-gray-700 dark:text-gray-200">{player.score} pontos</span>
               </div>
             ))}
           </div>
           <button
-            onClick={resetGame}
+            onClick={handleNewGame}
             className="bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-200"
           >
             Novo Jogo
@@ -259,25 +174,30 @@ const GameBoard = ({ players: initialPlayers }) => {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-      {/* Tabuleiro Principal */}
       <div className="lg:col-span-3">
         <div className="glass-morphism rounded-2xl p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-gray-800">Tabuleiro</h2>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Tabuleiro</h2>
             <div className="flex items-center space-x-4">
-              <div className="text-lg font-semibold">
+              <div className="text-lg font-semibold text-gray-800 dark:text-gray-100">
                 Vez de: <span style={{ color: players[currentPlayer].color }}>
                   {players[currentPlayer].name}
                 </span>
               </div>
+              <button
+                onClick={handleExit}
+                className="text-sm text-gray-400 hover:text-red-500 dark:text-gray-500 dark:hover:text-red-400 transition-colors"
+              >
+                Sair
+              </button>
             </div>
           </div>
-          
-          <Board 
-            players={players} 
+
+          <Board
+            players={players}
             currentPlayer={currentPlayer}
           />
-          
+
           <div className="flex justify-center mt-6">
             <Dice
               value={diceValue}
@@ -290,37 +210,25 @@ const GameBoard = ({ players: initialPlayers }) => {
         </div>
       </div>
 
-      {/* Painel Lateral */}
       <div className="space-y-6">
-        {/* Placar */}
-        <ScoreBoard players={players} />
-        
-        {/* Histórico */}
+        <ScoreBoard players={players} boardSize={BOARD_SIZE} />
         <GameHistory history={gameHistory} />
       </div>
 
-      {/* Modal de Perguntas */}
-      {showQuestion && (
+      {showQuestion && currentQuestion && (
         <QuestionModal
-          onClose={() => {
-            setShowQuestion(false)
-            handleQuestionAnswer(false)
-          }}
+          key={currentQuestion.id}
+          question={currentQuestion}
+          onClose={() => handleQuestionAnswer(false)}
           onAnswer={handleQuestionAnswer}
         />
       )}
 
-      {/* Modal de Alerta de Ácido */}
       {showAcidAlert && (
         <AcidAlertModal
-          isOpen={showAcidAlert}
-          onClose={() => {
-            setShowAcidAlert(false)
-            handleAcidAlert()
-          }}
           onConfirm={handleAcidAlert}
           acidType={acidType}
-          housesBack={5}
+          housesBack={ACID_PENALTY}
         />
       )}
     </div>

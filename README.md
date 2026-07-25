@@ -25,6 +25,17 @@ O **Ludo Orgânico** é um jogo educacional interativo que transforma o aprendiz
 - 🏆 **Competição Saudável**: Desafie amigos e teste seu conhecimento
 - ⚗️ **Contexto Real**: Questões baseadas em conceitos químicos reais
 
+### ✨ Novidades desta versão
+- 👥 Suporte a **2 a 4 jogadores** por partida
+- 🌗 **Modo escuro** com preferência salva
+- 🔊 Efeitos sonoros (mudo/ativo) e 🎉 confete ao vencer
+- ⏱️ Temporizador de 20s por pergunta
+- 📚 **Modo Estudo**: revise todas as perguntas, por categoria, sem pressão
+- 💾 Progresso salvo automaticamente (retome uma partida após fechar o navegador)
+- 🔀 Alternativas embaralhadas e perguntas sem repetição na mesma partida
+- 🧪 32 perguntas organizadas por categoria e dificuldade
+- ✅ Lógica de movimento/pontuação coberta por testes automatizados (Vitest)
+
 ---
 
 ## 🚀 Instalação Rápida
@@ -94,9 +105,9 @@ http://localhost:5173
 
 ### 🏁 Início do Jogo
 
-1. **Cadastro de Jogadores**: Insira os nomes dos dois jogadores
+1. **Cadastro de Jogadores**: Insira os nomes de 2 a 4 jogadores (ou entre no Modo Estudo para revisar o conteúdo sem jogar)
 2. **Lançar o Dado**: Clique no dado para sortear um número (1-6)
-3. **Responder Pergunta**: Uma pergunta de Química Orgânica aparecerá
+3. **Responder Pergunta**: Uma pergunta de Química Orgânica aparecerá, com 20 segundos para responder
 4. **Mover Peça**: Se acertar, avance o número de casas sorteadas
 
 ### 🎲 Regras do Jogo
@@ -118,7 +129,7 @@ http://localhost:5173
 ### 🏆 Condições de Vitória
 
 - O primeiro jogador a atingir a casa **50** vence!
-- Respostas corretas avançam, erradas perdem a vez
+- Respostas corretas avançam, erradas (ou tempo esgotado) perdem a vez
 - Estratégia: aproveite casas seguras, evite as ácidas!
 
 ---
@@ -144,11 +155,12 @@ http://localhost:5173
 
 ### 📖 Banco de Perguntas
 
-Atualmente com **8+ perguntas** covering:
-- ✅ Fórmulas estruturais
-- ✅ Reações e mecanismos  
-- ✅ Nomenclatura IUPAC
-- ✅ Propriedades físicas
+Atualmente com **32 perguntas** organizadas em `src/data/questions.js`, cobrindo:
+- ✅ Hidrocarbonetos, Funções Orgânicas, Nomenclatura
+- ✅ Reações Orgânicas, Isomeria, Aromaticidade
+- ✅ 3 níveis de dificuldade (fácil, médio, difícil)
+
+Use o **Modo Estudo** (na tela inicial) para revisar todas as perguntas com respostas e explicações, filtrando por categoria.
 
 ---
 
@@ -158,15 +170,32 @@ Atualmente com **8+ perguntas** covering:
 ludo-organico/
 ├── 📁 src/
 │   ├── 📁 components/
-│   │   ├── 🎮 App.jsx           # Componente principal
-│   │   ├── 🎲 Dice.jsx          # Componente do dado
-│   │   ├── 📋 Board.jsx         # Tabuleiro do jogo
-│   │   ├── 📝 QuestionModal.jsx # Modal de perguntas
-│   │   ├── ⚠️ AcidAlertModal.jsx # Alertas de ácidos
-│   │   ├── 📊 ScoreBoard.jsx    # Placar do jogo
-│   │   └── 📜 GameHistory.jsx   # Histórico de jogadas
+│   │   ├── 🎲 Dice.jsx           # Componente do dado
+│   │   ├── 📋 Board.jsx          # Tabuleiro do jogo
+│   │   ├── 📝 QuestionModal.jsx  # Modal de perguntas (com temporizador)
+│   │   ├── ⚠️ AcidAlertModal.jsx  # Alertas de ácidos
+│   │   ├── 📊 ScoreBoard.jsx     # Placar do jogo
+│   │   ├── 📜 GameHistory.jsx    # Histórico de jogadas
+│   │   ├── 🔐 Login.jsx          # Cadastro de 2-4 jogadores
+│   │   ├── 🎮 GameBoard.jsx      # Orquestra uma partida
+│   │   ├── 📚 StudyMode.jsx      # Revisão de perguntas sem jogar
+│   │   ├── 🎉 Confetti.jsx       # Efeito de vitória
+│   │   ├── 🌗 ThemeToggle.jsx    # Alternância claro/escuro
+│   │   └── 🔊 SoundToggle.jsx    # Alternância de som
+│   ├── 📁 data/
+│   │   ├── boardPath.js         # Layout do tabuleiro (fonte única)
+│   │   ├── questions.js         # Banco de perguntas + utilitários
+│   │   └── playerColors.js      # Paleta de cores dos jogadores
+│   ├── 📁 utils/
+│   │   ├── gameLogic.js         # Regras puras (movimento, pontuação, ácido)
+│   │   ├── gameLogic.test.js    # Testes da lógica do jogo
+│   │   ├── sound.js             # Efeitos sonoros (Web Audio API)
+│   │   └── storage.js           # Persistência em localStorage
+│   ├── 📁 hooks/
+│   │   └── useTheme.js          # Hook de modo escuro
 │   ├── 🎨 index.css             # Estilos globais
-│   └── 📄 App.jsx               # Aplicação principal
+│   ├── 📄 App.jsx               # Aplicação principal
+│   └── 📄 main.jsx              # Ponto de entrada
 ├── 📄 package.json              # Dependências
 ├── 📄 tailwind.config.js        # Configuração Tailwind
 └── 📄 postcss.config.js         # Configuração PostCSS
@@ -184,8 +213,15 @@ ludo-organico/
 
 ### ⚙️ **Ferramentas**
 - **ESLint** - Linting de código
+- **Vitest** - Testes automatizados da lógica do jogo
 - **Git** - Controle de versão
 - **Node.js** - Runtime JavaScript
+
+### 🧪 Rodando os testes
+
+```bash
+npm test
+```
 
 ---
 
@@ -257,14 +293,16 @@ Ideias para melhorar o jogo? [Participe das discussões](https://github.com/viei
 ## 🔮 Roadmap Futuro
 
 ### 🚀 Próximas Funcionalidades
-- [ ] **Modo Multiplayer Online** (até 4 jogadores)
-- [ ] **Níveis de Dificuldade** (Iniciante → Avançado)
-- [ ] **Temporizador** para respostas
+- [x] **Suporte a 2-4 jogadores locais**
+- [x] **Níveis de Dificuldade** por pergunta (Fácil/Médio/Difícil)
+- [x] **Temporizador** para respostas
+- [x] **Modo Estudo** sem competição
+- [x] **Tema Escuro** do jogo
+- [ ] **Modo Multiplayer Online** (jogadores em dispositivos diferentes)
 - [ ] **Ranking Global** e conquistas
-- [ ] **Modo Estudo** sem competição
-- [ ] **Tema Escuro** do jogo
 
 ### 📚 Expansão de Conteúdo
+- [x] Perguntas organizadas por categoria e dificuldade (32 perguntas)
 - [ ] **500+ perguntas** sobre Química Orgânica
 - [ ] **Química Inorgânica** módulo separado
 - [ ] **Físico-Química** conceitos avançados
