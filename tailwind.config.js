@@ -20,12 +20,30 @@ export default {
         'piece-move': 'pieceMove 0.5s ease-in-out',
         'bounce-gentle': 'bounceGentle 2s infinite',
         'confetti-fall': 'confettiFall 3s linear forwards',
-        'modal-pop': 'modalPop 0.25s ease-out'
+        'modal-pop': 'modalPop 0.25s ease-out',
+        'blob': 'blobFloat 10s ease-in-out infinite',
+        'blob-delayed': 'blobFloat 10s ease-in-out infinite 3s',
+        'fade-in-up': 'fadeInUp 0.7s ease-out both',
+        'float-slow': 'floatSlow 6s ease-in-out infinite',
+        'spin-slow': 'spin 12s linear infinite'
       },
       keyframes: {
         modalPop: {
           '0%': { transform: 'scale(0.95)', opacity: 0 },
           '100%': { transform: 'scale(1)', opacity: 1 }
+        },
+        blobFloat: {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '33%': { transform: 'translate(30px, -40px) scale(1.1)' },
+          '66%': { transform: 'translate(-20px, 20px) scale(0.95)' }
+        },
+        fadeInUp: {
+          '0%': { transform: 'translateY(16px)', opacity: 0 },
+          '100%': { transform: 'translateY(0)', opacity: 1 }
+        },
+        floatSlow: {
+          '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+          '50%': { transform: 'translateY(-14px) rotate(6deg)' }
         },
         diceRoll: {
           '0%': { transform: 'rotate(0deg) scale(1)' },

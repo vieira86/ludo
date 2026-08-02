@@ -4,6 +4,13 @@ import { PLAYER_COLORS } from '../data/playerColors'
 const MIN_PLAYERS = 2
 const MAX_PLAYERS = 4
 
+const STEPS = [
+  { icon: '👥', title: 'Monte os jogadores', desc: '2 a 4 pessoas por partida' },
+  { icon: '🎲', title: 'Lance o dado', desc: 'Mova sua peça pelo tabuleiro' },
+  { icon: '🧪', title: 'Responda', desc: 'Perguntas de química orgânica' },
+  { icon: '🏆', title: 'Vença', desc: 'Complete o tabuleiro primeiro' }
+]
+
 const Login = ({ onStartGame, onStudyMode, hasSavedGame, onResumeGame }) => {
   const [names, setNames] = useState(['', ''])
   const [errors, setErrors] = useState({})
@@ -59,11 +66,84 @@ const Login = ({ onStartGame, onStudyMode, hasSavedGame, onResumeGame }) => {
   }
 
   return (
-    <div className="max-w-md mx-auto">
-      <div className="glass-morphism rounded-2xl p-8 shadow-2xl">
-        <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          Iniciar Jogo
-        </h2>
+    <div className="relative">
+      {/* decorative background blobs */}
+      <div className="hero-blob w-72 h-72 bg-purple-300 dark:bg-purple-800 -top-16 -left-10 animate-blob" aria-hidden="true" />
+      <div className="hero-blob w-72 h-72 bg-blue-300 dark:bg-blue-800 top-10 -right-10 animate-blob-delayed" aria-hidden="true" />
+      <div className="hero-blob w-64 h-64 bg-green-300 dark:bg-green-800 bottom-0 left-1/3 animate-blob" aria-hidden="true" />
+
+      <div className="relative">
+        {/* HERO */}
+        <div className="grid lg:grid-cols-2 gap-10 items-center pt-2 pb-16">
+          <div className="animate-fade-in-up text-center lg:text-left">
+            <span className="stat-chip">✨ Aprendizado gamificado</span>
+
+            <h2 className="mt-5 text-4xl sm:text-5xl font-extrabold leading-tight text-gray-900 dark:text-white">
+              Transforme{' '}
+              <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                moléculas
+              </span>{' '}
+              em conhecimento
+            </h2>
+
+            <p className="mt-4 text-lg text-gray-600 dark:text-gray-300 max-w-xl mx-auto lg:mx-0">
+              Um jogo de tabuleiro para revisar Química Orgânica com os amigos: lance o dado,
+              responda perguntas e avance no tabuleiro.
+            </p>
+
+            <div className="mt-6 flex flex-wrap gap-3 justify-center lg:justify-start">
+              <span className="stat-chip">🎲 2 a 4 jogadores</span>
+              <span className="stat-chip">🧪 Perguntas de química</span>
+              <span className="stat-chip">📚 Modo estudo</span>
+              <span className="stat-chip">💾 Progresso salvo</span>
+            </div>
+
+            <a
+              href="#start-form"
+              className="mt-8 inline-flex items-center gap-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition-all duration-200"
+            >
+              Começar agora
+              <span aria-hidden="true">↓</span>
+            </a>
+          </div>
+
+          <div className="relative hidden lg:flex items-center justify-center h-80">
+            <div className="glass-morphism rounded-3xl w-72 h-72 flex items-center justify-center text-[7rem] animate-float-slow">
+              🎲
+            </div>
+            <div className="absolute top-0 left-4 w-16 h-16 rounded-2xl glass-morphism flex items-center justify-center text-3xl animate-spin-slow">
+              ⚗️
+            </div>
+            <div className="absolute bottom-2 right-6 w-20 h-20 rounded-2xl glass-morphism flex items-center justify-center text-4xl animate-bounce-gentle">
+              🧬
+            </div>
+            <div className="absolute top-1/3 right-0 w-14 h-14 rounded-full glass-morphism flex items-center justify-center text-2xl animate-float-slow">
+              🏆
+            </div>
+          </div>
+        </div>
+
+        {/* HOW IT WORKS */}
+        <div id="how-it-works" className="grid grid-cols-2 md:grid-cols-4 gap-4 pb-16">
+          {STEPS.map((step, index) => (
+            <div key={step.title} className="step-card animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+              <div className="text-4xl mb-3">{step.icon}</div>
+              <p className="text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wide mb-1">
+                Passo {index + 1}
+              </p>
+              <h3 className="font-semibold text-gray-800 dark:text-gray-100">{step.title}</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{step.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* START FORM */}
+      <div id="start-form" className="max-w-md mx-auto scroll-mt-24 pb-8">
+        <div className="glass-morphism rounded-2xl p-8 shadow-2xl">
+          <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            Iniciar Jogo
+          </h2>
 
         {hasSavedGame && (
           <button
@@ -144,15 +224,11 @@ const Login = ({ onStartGame, onStudyMode, hasSavedGame, onResumeGame }) => {
         </button>
 
         <div className="mt-8 p-4 bg-blue-50 dark:bg-slate-800/60 rounded-lg border border-blue-200 dark:border-slate-700">
-          <h3 className="font-semibold text-blue-800 dark:text-blue-300 mb-2">Como Jogar:</h3>
-          <ul className="text-sm text-blue-700 dark:text-blue-200 space-y-1">
-            <li>• De 2 a 4 jogadores por partida</li>
-            <li>• Lance o dado para mover suas peças</li>
-            <li>• Responda perguntas de química para avançar</li>
-            <li>• Erre a pergunta (ou o tempo acabe) e perca a vez</li>
-            <li>• Primeiro a completar o tabuleiro vence!</li>
-          </ul>
+          <p className="text-sm text-blue-700 dark:text-blue-200">
+            ⚠️ Errar a pergunta (ou o tempo acabar) faz perder a vez.
+          </p>
         </div>
+      </div>
       </div>
     </div>
   )
