@@ -55,6 +55,13 @@ const StudyMode = ({ onBack }) => {
                 </span>
               </div>
               <p className="font-semibold text-gray-800 dark:text-gray-100 mb-2">{q.question}</p>
+              {q.image && (
+                <img
+                  src={q.image}
+                  alt={q.imageAlt || 'Imagem da pergunta'}
+                  className="max-h-40 w-auto rounded-lg border border-gray-200 dark:border-slate-700 bg-white p-2 mb-2"
+                />
+              )}
               <ul className="space-y-1 mb-2">
                 {q.options.map((option, index) => (
                   <li

@@ -117,6 +117,15 @@ const QuestionModal = ({ question, onClose, onAnswer }) => {
             <p className="text-lg text-gray-700 dark:text-gray-200 leading-relaxed">
               {question.question}
             </p>
+            {question.image && (
+              <div className="mt-4 flex justify-center">
+                <img
+                  src={question.image}
+                  alt={question.imageAlt || 'Imagem da pergunta'}
+                  className="max-h-64 w-auto rounded-lg border border-gray-200 dark:border-slate-700 bg-white p-2"
+                />
+              </div>
+            )}
           </div>
 
           <div className="space-y-3 mb-6">

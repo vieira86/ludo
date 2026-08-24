@@ -1,5 +1,10 @@
 // Banco de perguntas de Química Orgânica.
 // categoria: agrupa por tema; dificuldade: 'facil' | 'medio' | 'dificil'.
+//
+// Campos opcionais de imagem (omita se a pergunta não usar imagem):
+//   image:    caminho público da imagem, ex.: '/images/questions/aspirina-aas.png'
+//             (o arquivo deve estar em public/images/questions/, caminho começando com "/")
+//   imageAlt: texto alternativo descrevendo a imagem (acessibilidade)
 export const CATEGORIES = [
   'Hidrocarbonetos',
   'Funções Orgânicas',
@@ -137,7 +142,13 @@ export const QUESTIONS = [
   { id: 32, category: 'Funções Orgânicas', difficulty: 'facil',
     question: 'Éteres possuem qual estrutura característica?',
     options: ['Um oxigênio ligado a dois grupos carbônicos (R-O-R\')', 'Uma hidroxila ligada a um carbono', 'Uma carbonila terminal', 'Um nitrogênio ligado a hidrogênios'], correct: 0,
-    explanation: 'Éteres têm um átomo de oxigênio conectando duas cadeias carbônicas, sem hidrogênio ligado ao oxigênio.' }
+    explanation: 'Éteres têm um átomo de oxigênio conectando duas cadeias carbônicas, sem hidrogênio ligado ao oxigênio.' },
+  { id: 33, category: 'Funções Orgânicas', difficulty: 'medio',
+    question: 'Observe a estrutura do ácido acetilsalicílico (aspirina). Qual função orgânica NÃO está presente na molécula?',
+    image: '/images/questions/aspirina-aas.png',
+    imageAlt: 'Estrutura do ácido acetilsalicílico (aspirina)',
+    options: ['Éster', 'Ácido carboxílico', 'Anel aromático', 'Amina'], correct: 3,
+    explanation: 'A aspirina possui um éster (grupo acetil), um ácido carboxílico e um anel aromático. Não há grupo amina (-NH₂) na molécula.' }
 ]
 
 export function shuffleArray(array) {

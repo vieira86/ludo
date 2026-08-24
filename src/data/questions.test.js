@@ -15,6 +15,15 @@ describe('QUESTIONS bank', () => {
     })
   })
 
+  it('every question with an image has a public path and alt text', () => {
+    QUESTIONS.forEach(q => {
+      if (q.image === undefined) return
+      expect(q.image.startsWith('/')).toBe(true)
+      expect(typeof q.imageAlt).toBe('string')
+      expect(q.imageAlt.length).toBeGreaterThan(0)
+    })
+  })
+
 })
 
 describe('shuffleQuestionOptions', () => {
