@@ -216,12 +216,12 @@ const Login = ({ onStartGame, onStudyMode, hasSavedGame, onResumeGame }) => {
           </button>
         </form>
 
-        <button
+        {/* <button
           onClick={onStudyMode}
           className="w-full mt-4 bg-white/50 dark:bg-slate-800/50 border border-purple-200 dark:border-slate-700 text-purple-700 dark:text-purple-300 font-semibold py-3 px-6 rounded-lg hover:bg-purple-50 dark:hover:bg-slate-800 transition-all duration-200"
         >
           📚 Modo Estudo (revisar perguntas sem jogar)
-        </button>
+        </button> */}
 
         <div className="mt-8 p-4 bg-blue-50 dark:bg-slate-800/60 rounded-lg border border-blue-200 dark:border-slate-700">
           <p className="text-sm text-blue-700 dark:text-blue-200">

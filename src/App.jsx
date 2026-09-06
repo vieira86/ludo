@@ -108,7 +108,7 @@ function App() {
                     <ul className="space-y-2">
                         <li><a href="#features" className="text-gray-400 hover:text-white transition-colors">Features</a></li>
                         <li><a href="#how-it-works" className="text-gray-400 hover:text-white transition-colors">Como Funciona</a></li>
-                        <li><a href="https://github.com/vieira86" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white transition-colors">GitHub</a></li>
+                        {/* <li><a href="https://github.com/vieira86" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white transition-colors">GitHub</a></li> */}
                     </ul>
                 </div>
 
@@ -127,7 +127,7 @@ function App() {
                         </div>
                     </div>
 
-                    <div className="flex space-x-4 mt-4">
+                    {/* <div className="flex space-x-4 mt-4">
                         <a href="https://github.com/vieira86" target="_blank" rel="noreferrer"
                         className="flex items-center space-x-2 text-gray-400 hover:text-white transition">
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -135,7 +135,7 @@ function App() {
                             </svg>
                             <span>GitHub</span>
                         </a>
-                    </div>
+                    </div> */}
                 </div>
             </div>
 
