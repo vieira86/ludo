@@ -108,6 +108,8 @@ function App() {
                     <ul className="space-y-2">
                         <li><a href="#features" className="text-gray-400 hover:text-white transition-colors">Features</a></li>
                         <li><a href="#how-it-works" className="text-gray-400 hover:text-white transition-colors">Como Funciona</a></li>
+                        {/* TODO: substitua pelo link do Web App do Google Apps Script depois de implantar (veja LEIA-ME.docx). */}
+                        <li><a href="https://script.google.com/macros/s/AKfycbzQuhtPCATS3vZyyu4ooHkFAP2OYvUnM9FGSmejShI9-L9XIHKIqFUpPEhDuHkTzdEU/exec" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white transition-colors">Questionário dos alunos</a></li>
                         {/* <li><a href="https://github.com/vieira86" target="_blank" rel="noreferrer" className="text-gray-400 hover:text-white transition-colors">GitHub</a></li> */}
                     </ul>
                 </div>

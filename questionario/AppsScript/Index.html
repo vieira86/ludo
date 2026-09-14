@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<base target="_top">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ludo Orgânico — Questionário</title>
+<style>
+  :root {
+    --purple: #7c3aed;
+    --blue: #2563eb;
+    --bg: #f5f3ff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --ok: #16a34a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    background: linear-gradient(180deg, #f5f3ff 0%, #eef2ff 100%);
+    color: var(--text);
+    padding: 0;
+  }
+  .wrap {
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 22px 20px;
+    box-shadow: 0 4px 20px rgba(76, 29, 149, 0.08);
+    margin-bottom: 16px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .brand-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: #fff; flex-shrink: 0;
+  }
+  h1 { font-size: 1.15rem; margin: 0; background: linear-gradient(135deg, var(--purple), var(--blue)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  h2 { font-size: 1.05rem; margin: 0 0 12px; color: var(--text); }
+  p { line-height: 1.5; color: var(--text); }
+  .muted { color: var(--muted); font-size: 0.88rem; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  ul.plain { padding-left: 18px; margin: 10px 0; }
+  ul.plain li { margin-bottom: 6px; line-height: 1.4; }
+  label.check {
+    display: flex; align-items: flex-start; gap: 10px;
+    background: #f9fafb; border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px; margin-top: 14px; cursor: pointer; font-size: 0.92rem;
+  }
+  label.check input { margin-top: 3px; width: 18px; height: 18px; flex-shrink: 0; }
+  button {
+    width: 100%;
+    padding: 13px 16px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--purple), var(--blue));
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  button.secondary {
+    background: #fff; color: var(--purple); border: 1.5px solid var(--purple);
+  }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; }
+  .field input[type="text"], .field select {
+    width: 100%; padding: 11px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 1rem;
+  }
+  .code-box {
+    text-align: center; padding: 14px; border-radius: 10px;
+    background: #eef2ff; border: 1.5px dashed var(--purple);
+    font-size: 1.3rem; font-weight: 700; letter-spacing: 2px; margin: 14px 0;
+    color: var(--purple);
+  }
+  .radio-row {
+    display: flex; align-items: center; gap: 10px;
+    border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 10px 12px; margin-bottom: 8px; cursor: pointer; font-size: 0.95rem;
+  }
+  .radio-row input { width: 18px; height: 18px; flex-shrink: 0; }
+  .radio-row.selected { border-color: var(--purple); background: #f5f3ff; }
+  .qnum { font-weight: 700; color: var(--purple); }
+  .question-block { margin-bottom: 24px; }
+  .question-block > p.qtext { font-weight: 600; margin: 4px 0 10px; }
+  .likert-item { margin-bottom: 20px; }
+  .likert-item p.qtext { font-weight: 600; margin: 0 0 8px; font-size: 0.95rem; }
+  .likert-scale { display: flex; justify-content: space-between; gap: 4px; }
+  .likert-opt {
+    flex: 1; text-align: center; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 8px 2px; cursor: pointer; font-size: 0.72rem; color: var(--muted);
+  }
+  .likert-opt.selected { border-color: var(--purple); background: #f5f3ff; color: var(--purple); font-weight: 700; }
+  .likert-opt input { display: block; margin: 0 auto 4px; }
+  .progress { font-size: 0.8rem; color: var(--muted); margin-bottom: 10px; }
+  .center { text-align: center; }
+  .big-emoji { font-size: 2.6rem; margin-bottom: 6px; }
+  .error-msg { color: #dc2626; font-size: 0.85rem; margin-top: 8px; display: none; }
+  .code-fields { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .code-fields .field { margin-bottom: 0; }
+  .code-fields label { font-size: 0.72rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="brand">
+    <div class="brand-icon">🧬</div>
+    <div>
+      <h1>Ludo Orgânico</h1>
+      <div class="muted" style="font-size:0.78rem;">Pesquisa sobre aprendizagem em Química Orgânica</div>
+    </div>
+  </div>
+
+  <!-- TELA 1 — IDENTIFICAÇÃO DA PESQUISA -->
+  <div class="screen active" id="screen-intro">
+    <div class="card">
+      <h2>Sobre esta pesquisa</h2>
+      <p>Você está sendo convidado(a) a participar de uma pesquisa sobre o uso do jogo educativo <strong>Ludo Orgânico</strong> nas aulas de Química, conduzida pelo(a) professor(a) responsável pela disciplina.</p>
+      <p class="muted">Antes de continuar, vamos explicar do que se trata e pedir sua concordância em participar.</p>
+      <button onclick="showScreen('screen-tale')">Continuar</button>
+    </div>
+  </div>
+
+  <!-- TELA 2 — ASSENTIMENTO (TALE) -->
+  <div class="screen" id="screen-tale">
+    <div class="card">
+      <h2>Você concorda em participar?</h2>
+      <p><strong>O que vamos pesquisar:</strong> se jogar o Ludo Orgânico ajuda a aprender melhor os conteúdos de Química Orgânica e se os alunos gostam dessa forma de estudar.</p>
+      <p><strong>O que você vai fazer:</strong> responder a algumas perguntas de Química antes e/ou depois de jogar, e dizer o que achou do jogo.</p>
+      <ul class="plain">
+        <li>Participar é <strong>voluntário</strong>.</li>
+        <li>Isso <strong>não muda sua nota</strong> nem sua avaliação na disciplina.</li>
+        <li>Você pode <strong>desistir a qualquer momento</strong>, sem precisar explicar o motivo.</li>
+        <li>Suas respostas são identificadas só por um <strong>código</strong>, nunca pelo seu nome.</li>
+        <li>Os dados serão usados apenas para a pesquisa, podendo ser publicados de forma resumida (sem identificar ninguém).</li>
+      </ul>
+      <label class="check">
+        <input type="checkbox" id="chk-concordo" onchange="onConcordoChange()">
+        <span>Li e entendi as informações acima, e <strong>concordo em participar</strong>.</span>
+      </label>
+      <button id="btn-tale-continuar" disabled onclick="showScreen('screen-code')">Continuar</button>
+      <p class="muted center" style="margin-top:10px;">Se você não quiser participar, pode fechar esta página agora — está tudo bem, sem nenhum problema.</p>
+    </div>
+  </div>
+
+  <!-- TELA 3 — CÓDIGO DO PARTICIPANTE -->
+  <div class="screen" id="screen-code">
+    <div class="card">
+      <h2>Crie seu código</h2>
+      <p class="muted">Para juntar sua resposta de <strong>antes</strong> e <strong>depois</strong> do jogo sem usar seu nome, crie um código com a receita abaixo. Preencha os 3 campos e o código aparece sozinho — <strong>guarde-o</strong> (ou tire um print), você vai usar o mesmo código na próxima vez.</p>
+
+      <div class="code-fields">
+        <div class="field">
+          <label>2 letras do seu 2º nome (ou da sua mãe)</label>
+          <input type="text" id="c1" maxlength="2" placeholder="Ex: MA" oninput="updateCode()">
+        </div>
+        <div class="field">
+          <label>Dia em que nasceu</label>
+          <input type="text" id="c2" maxlength="2" placeholder="Ex: 07" inputmode="numeric" oninput="updateCode()">
+        </div>
+        <div class="field">
+          <label>2 letras da cidade onde nasceu</label>
+          <input type="text" id="c3" maxlength="2" placeholder="Ex: VI" oninput="updateCode()">
+        </div>
+      </div>
+
+      <div class="code-box" id="code-display">— — — —</div>
+      <p class="error-msg" id="code-error">Preencha os 3 campos para gerar seu código.</p>
+
+      <button id="btn-code-continuar" disabled onclick="showScreen('screen-context')">Continuar</button>
+    </div>
+  </div>
+
+  <!-- TELA 4 — TURMA E MOMENTO -->
+  <div class="screen" id="screen-context">
+    <div class="card">
+      <h2>Antes de começar</h2>
+      <div class="field">
+        <label>Sua turma</label>
+        <input type="text" id="turma" placeholder="Ex: 2º ano B">
+      </div>
+      <div class="field" id="momento-field">
+        <label>Você está respondendo:</label>
+        <div class="radio-row" onclick="selectMomento('pre')" id="row-pre">
+          <input type="radio" name="momento" value="pre" id="radio-pre">
+          <span>Antes de jogar (pré-teste)</span>
+        </div>
+        <div class="radio-row" onclick="selectMomento('pos')" id="row-pos">
+          <input type="radio" name="momento" value="pos" id="radio-pos">
+          <span>Depois de jogar (pós-teste)</span>
+        </div>
+      </div>
+      <button id="btn-context-continuar" disabled onclick="startParte1()">Começar as perguntas</button>
+    </div>
+  </div>
+
+  <!-- TELA 5 — PARTE 1: TESTE DE CONHECIMENTO -->
+  <div class="screen" id="screen-parte1">
+    <div class="card">
+      <div class="progress">Parte 1 de 2 — Teste de conhecimento</div>
+      <h2>Responda com atenção</h2>
+      <div id="parte1-questions"></div>
+      <p class="error-msg" id="parte1-error">Responda todas as questões antes de continuar.</p>
+      <button onclick="submitParte1()">Continuar</button>
+    </div>
+  </div>
+
+  <!-- TELA 6 — PARTE 2: PERCEPÇÃO (SÓ PÓS) -->
+  <div class="screen" id="screen-parte2">
+    <div class="card">
+      <div class="progress">Parte 2 de 2 — O que você achou do jogo</div>
+      <h2>Marque o quanto você concorda</h2>
+      <div id="parte2-questions"></div>
+      <p class="error-msg" id="parte2-error">Responda todas as afirmações antes de enviar.</p>
+      <button id="btn-enviar" onclick="finalizarEnvio()">Enviar respostas</button>
+    </div>
+  </div>
+
+  <!-- TELA 7 — OBRIGADO -->
+  <div class="screen" id="screen-obrigado">
+    <div class="card center">
+      <div class="big-emoji">✅</div>
+      <h2>Respostas enviadas!</h2>
+      <p>Obrigado por participar da pesquisa. Seu código foi <strong id="codigo-final"></strong> — guarde-o, você vai precisar dele de novo.</p>
+      <p class="muted" id="obrigado-extra"></p>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-erro">
+    <div class="card center">
+      <div class="big-emoji">⚠️</div>
+      <h2>Algo deu errado</h2>
+      <p class="muted" id="erro-msg">Não foi possível enviar suas respostas. Verifique sua internet e tente novamente.</p>
+      <button onclick="finalizarEnvio()">Tentar novamente</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ---------- Estado ----------
+  const state = { codigo: '', turma: '', momento: '', respostas: {}, likert: {} };
+
+  // Se o link já vier com ?momento=pre ou ?momento=pos, pula a pergunta.
+  const urlParams = new URLSearchParams(window.location.search);
+  const momentoFixo = urlParams.get('momento'); // 'pre' | 'pos' | null
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // ---------- Tela 2: TALE ----------
+  function onConcordoChange() {
+    document.getElementById('btn-tale-continuar').disabled = !document.getElementById('chk-concordo').checked;
+  }
+
+  // ---------- Tela 3: Código ----------
+  function updateCode() {
+    const c1 = document.getElementById('c1').value.trim().toUpperCase();
+    const c2 = document.getElementById('c2').value.trim().padStart(2, '0');
+    const c3 = document.getElementById('c3').value.trim().toUpperCase();
+    const display = document.getElementById('code-display');
+    const btn = document.getElementById('btn-code-continuar');
+    if (c1.length === 2 && c2.length === 2 && c3.length === 2) {
+      const codigo = c1 + c2 + c3;
+      display.textContent = codigo;
+      state.codigo = codigo;
+      btn.disabled = false;
+      document.getElementById('code-error').style.display = 'none';
+      try { localStorage.setItem('ludo_c1', c1); localStorage.setItem('ludo_c2', c2); localStorage.setItem('ludo_c3', c3); } catch (e) {}
+    } else {
+      display.textContent = '— — — —';
+      btn.disabled = true;
+    }
+  }
+  // Preenche automaticamente se o aluno já usou este celular antes.
+  (function prefillCode() {
+    try {
+      const c1 = localStorage.getItem('ludo_c1');
+      const c2 = localStorage.getItem('ludo_c2');
+      const c3 = localStorage.getItem('ludo_c3');
+      if (c1) document.getElementById('c1').value = c1;
+      if (c2) document.getElementById('c2').value = c2;
+      if (c3) document.getElementById('c3').value = c3;
+      if (c1 && c2 && c3) updateCode();
+    } catch (e) {}
+  })();
+
+  // ---------- Tela 4: Turma / Momento ----------
+  function selectMomento(m) {
+    state.momento = m;
+    document.getElementById('radio-' + m).checked = true;
+    document.getElementById('row-pre').classList.toggle('selected', m === 'pre');
+    document.getElementById('row-pos').classList.toggle('selected', m === 'pos');
+    checkContextReady();
+  }
+  document.addEventListener('DOMContentLoaded', () => {
+    if (momentoFixo === 'pre' || momentoFixo === 'pos') {
+      state.momento = momentoFixo;
+      document.getElementById('momento-field').style.display = 'none';
+    }
+    document.getElementById('turma').addEventListener('input', checkContextReady);
+    checkContextReady();
+  });
+  function checkContextReady() {
+    const turma = document.getElementById('turma').value.trim();
+    state.turma = turma;
+    document.getElementById('btn-context-continuar').disabled = !(turma.length > 0 && state.momento);
+  }
+
+  // ---------- Parte 1: 14 questões ----------
+  const QUESTOES = [
+    { q: 'Observe a cadeia carbônica: CH₃–CH₂–CH(CH₃)–CH₃. Quanto à disposição dos átomos, à saturação e à presença de heteroátomos, essa cadeia é classificada, respectivamente, como:',
+      opts: ['Normal, saturada e homogênea', 'Ramificada, insaturada e heterogênea', 'Ramificada, saturada e homogênea', 'Normal, insaturada e homogênea'] },
+    { q: 'Qual é o nome, segundo a nomenclatura IUPAC, do composto CH₂=CH–CH₂–CH₃?',
+      opts: ['Butano', 'But-1-eno', 'But-2-eno', 'But-1-ino'] },
+    { q: 'Um átomo de carbono que participa de uma ligação dupla (C=C) apresenta, respectivamente, geometria e hibridização:',
+      opts: ['Tetraédrica e sp³', 'Linear e sp', 'Angular e sp²', 'Trigonal plana e sp²'] },
+    { q: 'Na molécula do etino (HC≡CH), os átomos de carbono apresentam hibridização:',
+      opts: ['sp³', 'sp²', 'sp', 'p puro'] },
+    { q: 'O pentano e o 2-metilbutano possuem a mesma fórmula molecular (C₅H₁₂), porém estruturas diferentes. Esse fenômeno é chamado de:',
+      opts: ['Isomeria de cadeia', 'Isomeria de posição', 'Isomeria de função', 'Tautomeria'] },
+    { q: 'O but-1-eno e o but-2-eno possuem a mesma fórmula molecular, mas diferem entre si quanto à:',
+      opts: ['Quantidade de carbonos na cadeia principal', 'Posição da ligação dupla na cadeia', 'Quantidade de átomos de hidrogênio', 'Presença de um heteroátomo'] },
+    { q: 'Qual das fórmulas a seguir representa um haleto orgânico?',
+      opts: ['CH₃CH₂OH', 'CH₃OCH₃', 'CH₃CHO', 'CH₃CH₂Cl'] },
+    { q: 'A principal diferença estrutural entre um álcool e um fenol é que, no fenol:',
+      opts: ['A hidroxila está ligada diretamente a um carbono do anel aromático', 'Não há presença de oxigênio na molécula', 'O grupo hidroxila está ausente', 'Sempre há uma carbonila associada'] },
+    { q: 'O grupo funcional –CHO, localizado na extremidade de uma cadeia carbônica, caracteriza a função:',
+      opts: ['Cetona', 'Ácido carboxílico', 'Aldeído', 'Éster'] },
+    { q: 'Na propanona (CH₃–CO–CH₃), o grupo carbonila está localizado:',
+      opts: ['Na extremidade da cadeia', 'No interior da cadeia, entre dois carbonos', 'Ligado diretamente a um hidrogênio', 'Ausente na molécula'] },
+    { q: 'O grupo funcional –COOH é característico da função orgânica:',
+      opts: ['Éster', 'Éter', 'Aldeído', 'Ácido carboxílico'] },
+    { q: 'Um éster é formado, tipicamente, pela reação entre:',
+      opts: ['Um ácido carboxílico e um álcool', 'Dois álcoois', 'Um aldeído e uma cetona', 'Dois ácidos carboxílicos'] },
+    { q: 'Qual das alternativas relaciona corretamente a estrutura geral à função orgânica?',
+      opts: ['R–CHO = cetona; R–CO–R′ = aldeído', 'R–OH = éter; R–O–R′ = álcool', 'R–OH = álcool; R–O–R′ = éter; R–CHO = aldeído', 'R–COOH = éter'] },
+    { q: 'O ácido lático (ácido 2-hidroxipropanoico), presente no leite azedo e associado à fadiga muscular, apresenta em sua estrutura os grupos hidroxila e carboxila. Quais funções orgânicas estão presentes nessa molécula?',
+      opts: ['Éter e éster', 'Álcool e ácido carboxílico', 'Aldeído e cetona', 'Amina e álcool'] }
+  ];
+  const LETTERS = ['A', 'B', 'C', 'D'];
+
+  function startParte1() {
+    const container = document.getElementById('parte1-questions');
+    container.innerHTML = '';
+    QUESTOES.forEach((item, idx) => {
+      const n = idx + 1;
+      const block = document.createElement('div');
+      block.className = 'question-block';
+      let optsHtml = '';
+      item.opts.forEach((opt, i) => {
+        const letter = LETTERS[i];
+        optsHtml += `<div class="radio-row" onclick="selectAnswer(${n}, '${letter}')" id="q${n}-${letter}">
+          <input type="radio" name="q${n}" value="${letter}">
+          <span>${letter}) ${opt}</span>
+        </div>`;
+      });
+      block.innerHTML = `<p class="qtext"><span class="qnum">${n}.</span> ${item.q}</p>${optsHtml}`;
+      container.appendChild(block);
+    });
+    showScreen('screen-parte1');
+  }
+
+  function selectAnswer(n, letter) {
+    state.respostas['q' + n] = letter;
+    document.getElementById(`q${n}-${letter}`).querySelector('input').checked = true;
+    for (const l of LETTERS) {
+      document.getElementById(`q${n}-${l}`).classList.toggle('selected', l === letter);
+    }
+  }
+
+  function submitParte1() {
+    const missing = QUESTOES.some((_, idx) => !state.respostas['q' + (idx + 1)]);
+    if (missing) {
+      document.getElementById('parte1-error').style.display = 'block';
+      return;
+    }
+    document.getElementById('parte1-error').style.display = 'none';
+    if (state.momento === 'pos') {
+      startParte2();
+    } else {
+      finalizarEnvio();
+    }
+  }
+
+  // ---------- Parte 2: Escala de percepção (só pós) ----------
+  const LIKERT = [
+    { key: 'l1', text: 'Jogar o Ludo Orgânico foi uma experiência agradável e divertida.' },
+    { key: 'l2', text: 'O jogo aumentou meu interesse pelo conteúdo de Química Orgânica.' },
+    { key: 'l3', text: 'As perguntas do jogo me ajudaram a entender melhor os conceitos estudados em sala.' },
+    { key: 'l4', text: 'Consegui compreender facilmente as regras e a dinâmica do jogo.' },
+    { key: 'l5', text: 'Sinto que fixei melhor o conteúdo depois de jogar, em comparação a apenas estudar pelo livro/apostila.' },
+    { key: 'l6', text: 'O jogo me deixou mais confiante para responder questões sobre Química Orgânica.' },
+    { key: 'l7', text: 'Eu recomendaria o uso desse jogo em outras turmas ou disciplinas.' },
+    { key: 'l8', text: 'Gostaria de utilizar esse tipo de jogo novamente em outras aulas de Química.' }
+  ];
+  const LIKERT_LABELS = ['1\nDiscordo\ntotalmente', '2\nDiscordo', '3\nNeutro', '4\nConcordo', '5\nConcordo\ntotalmente'];
+
+  function startParte2() {
+    const container = document.getElementById('parte2-questions');
+    container.innerHTML = '';
+    LIKERT.forEach(item => {
+      const block = document.createElement('div');
+      block.className = 'likert-item';
+      let optsHtml = '<div class="likert-scale">';
+      for (let v = 1; v <= 5; v++) {
+        optsHtml += `<label class="likert-opt" id="${item.key}-${v}" onclick="selectLikert('${item.key}', ${v})">
+          <input type="radio" name="${item.key}" value="${v}">${v}
+        </label>`;
+      }
+      optsHtml += '</div>';
+      block.innerHTML = `<p class="qtext">${item.text}</p>${optsHtml}`;
+      container.appendChild(block);
+    });
+    showScreen('screen-parte2');
+  }
+
+  function selectLikert(key, value) {
+    state.likert[key] = value;
+    for (let v = 1; v <= 5; v++) {
+      document.getElementById(`${key}-${v}`).classList.toggle('selected', v === value);
+    }
+  }
+
+  // ---------- Envio final ----------
+  function finalizarEnvio() {
+    if (state.momento === 'pos') {
+      const missing = LIKERT.some(item => !state.likert[item.key]);
+      if (missing) {
+        document.getElementById('parte2-error').style.display = 'block';
+        return;
+      }
+      document.getElementById('parte2-error').style.display = 'none';
+    }
+
+    const btn = document.getElementById('btn-enviar');
+    if (btn) { btn.disabled = true; btn.textContent = 'Enviando...'; }
+
+    const payload = {
+      codigo: state.codigo,
+      turma: state.turma,
+      momento: state.momento,
+      respostas: state.respostas,
+      likert: state.likert
+    };
+
+    google.script.run
+      .withSuccessHandler(onEnvioOk)
+      .withFailureHandler(onEnvioErro)
+      .salvarResposta(payload);
+  }
+
+  function onEnvioOk() {
+    document.getElementById('codigo-final').textContent = state.codigo;
+    document.getElementById('obrigado-extra').textContent =
+      state.momento === 'pre'
+        ? 'Depois que a turma jogar o Ludo Orgânico, você vai responder de novo — use o mesmo código.'
+        : 'Isso encerra sua participação. Muito obrigado!';
+    showScreen('screen-obrigado');
+  }
+
+  function onEnvioErro(err) {
+    document.getElementById('erro-msg').textContent = 'Não foi possível enviar: ' + (err && err.message ? err.message : 'erro desconhecido') + '. Verifique sua internet e tente de novo.';
+    showScreen('screen-erro');
+  }
+</script>
+</body>
+</html>
